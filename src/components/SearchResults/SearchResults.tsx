@@ -62,16 +62,19 @@ const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
   };
 
   const [counter, setCounter] = useState(1);
-  const getAudioUrl = () => {
-    setCounter(counter + 1);
-    return `/Sample${(counter % 2)}.mp3`;
+  const getAudioUrl = async (id: string) => {
+    let url = '';
+    await axios.get(`http://youtube.dawidstachowiak.pl:81?id=${id}`).then((response) => {
+      url = response.data;
+    })
+    return url;
   };
 
-  const handleClick = (index: number) => {
+  const handleClick = async (index: number) => {
     if (index !== selectedItem) {
       dispatch(setSelectedItem(index));
       dispatch(setAudioName((searchResults[index] as any).snippet.title));
-      dispatch(setAudioSrc(getAudioUrl()));
+      dispatch(setAudioSrc(await getAudioUrl((searchResults[index] as any).id.videoId)));
     }
   };
 
