@@ -18,7 +18,7 @@ function App() {
           <Route path="/search/:phrase" element={<SearchResultsComponent />} />
         </Routes>
         <PlayerComponent />
-      </BrowserRouter>,
+      </BrowserRouter>
 
     </>
   );
