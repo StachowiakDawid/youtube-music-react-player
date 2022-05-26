@@ -8,7 +8,7 @@ import {
 import { setSearchPhrase, getSearchPhrase } from '../../slices/searchPhraseSlice';
 import { setSearchResults, getSearchResults } from '../../slices/searchResultsSlice';
 import axios from 'axios';
-import { YT_API_KEY, YT_API_URL } from '../../constants';
+import { BACKEND_URL, YT_API_KEY, YT_API_URL } from '../../constants';
 interface SearchResultsComponentProps { }
 
 const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
@@ -29,6 +29,7 @@ const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
       setIsLoaded(true);
       setDataLength(searchResults.length);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = (pageToken?: string) => {
@@ -61,10 +62,9 @@ const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
     });
   };
 
-  const [counter, setCounter] = useState(1);
   const getAudioUrl = async (id: string) => {
     let url = '';
-    await axios.get(`http://youtube.dawidstachowiak.pl:81?id=${id}`).then((response) => {
+    await axios.get(`${BACKEND_URL}?id=${id}`).then((response) => {
       url = response.data;
     })
     return url;
