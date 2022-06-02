@@ -89,7 +89,7 @@ const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
           <ul className="list-group list-group-flush">
             {isLoaded &&
              searchResults.map((item: any, index: number) => (
-              <li className={"list-group-item ps-0 " + ((selectedItem === index) ? 'bg-light' : '')} key={index} onClick={() => handleClick(index)}>
+              <li className={"list-group-item ps-0 " + ((selectedItem === index) ? 'bg-light' : '')} key={item.id.videoId} onClick={() => handleClick(index)}>
                 <div className="row">
                   <div className="col-sm-4">
                     <img className="w-100" alt="thumbnail" src={item.snippet.thumbnails.medium.url} />
