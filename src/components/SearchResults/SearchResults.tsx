@@ -2,17 +2,16 @@ import React, { FC, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import {
-  setAudioName, setAudioSrc, getSelectedItem, setSelectedItem
-} from '../../slices/playerSlice';
+import { getSelectedItem, setSelectedItem } from '../../slices/playerSlice';
 import { setSearchPhrase, getSearchPhrase } from '../../slices/searchPhraseSlice';
 import { setSearchResults, getSearchResults } from '../../slices/searchResultsSlice';
 import axios from 'axios';
-import { BACKEND_URL, YT_API_KEY, YT_API_URL } from '../../constants';
+import { YT_API_KEY, YT_API_URL } from '../../constants';
 interface SearchResultsComponentProps { }
 
 const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
   const dispatch = useAppDispatch();
+  const [selectedItemIndex, setSelectedItemIndex] = useState(-1);
   const selectedItem = useAppSelector(getSelectedItem);
   const searchPhrase = useAppSelector(getSearchPhrase);
   const { phrase } = useParams();
@@ -22,6 +21,9 @@ const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
   const [nextPageToken, setNextPageToken] = useState('');
 
   useEffect(() => {
+    if (selectedItem === -1) {
+      setSelectedItemIndex(-1);
+    }
     if (searchPhrase !== phrase) {
       dispatch(setSearchPhrase(phrase!));
       fetchData();
@@ -30,7 +32,7 @@ const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
       setDataLength(searchResults.length);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedItem]);
 
   const fetchData = (pageToken?: string) => {
     const params = new URLSearchParams();
@@ -62,19 +64,10 @@ const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
     });
   };
 
-  const getAudioUrl = async (id: string) => {
-    let url = '';
-    await axios.get(`${BACKEND_URL}?id=${id}`).then((response) => {
-      url = response.data;
-    })
-    return url;
-  };
-
   const handleClick = async (index: number) => {
-    if (index !== selectedItem) {
-      dispatch(setSelectedItem(index));
-      dispatch(setAudioName((searchResults[index] as any).snippet.title));
-      dispatch(setAudioSrc(await getAudioUrl((searchResults[index] as any).id.videoId)));
+    if (index !== selectedItemIndex) {
+      setSelectedItemIndex(index);
+      dispatch(setSelectedItem((searchResults[index] as any)));
     }
   };
 
@@ -89,7 +82,7 @@ const SearchResultsComponent: FC<SearchResultsComponentProps> = () => {
           <ul className="list-group list-group-flush">
             {isLoaded &&
              searchResults.map((item: any, index: number) => (
-              <li className={"list-group-item ps-0 " + ((selectedItem === index) ? 'bg-light' : '')} key={item.id.videoId} onClick={() => handleClick(index)}>
+              <li className={"list-group-item ps-0 " + ((selectedItemIndex === index) ? 'bg-light' : '')} key={item.id.videoId} onClick={() => handleClick(index)}>
                 <div className="row">
                   <div className="col-sm-4">
                     <img className="w-100" alt="thumbnail" src={item.snippet.thumbnails.medium.url} />
